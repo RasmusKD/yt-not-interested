@@ -1,6 +1,6 @@
-# YT Not Interested
+# Not Interested Button for YouTube
 
-A one-click Not interested button on YouTube video cards, right next to the ⋮ menu.
+A one-click Not interested button on YouTube video cards, right next to the ⋮ menu. An independent project, not affiliated with or endorsed by YouTube or Google.
 
 The button runs the same command as the menu's own Not interested entry, so nothing is faked: YouTube sends the request and shows its normal "removed" card with Undo. There is no overlay and no clicking through the menu behind your back.
 
