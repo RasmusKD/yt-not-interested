@@ -1,0 +1,33 @@
+# YT Not Interested
+
+A one-click Not interested button on YouTube video cards, right next to the ⋮ menu.
+
+The button runs the same command as the menu's own Not interested entry, so nothing is faked: YouTube sends the request and shows its normal "removed" card with Undo. There is no overlay and no clicking through the menu behind your back.
+
+- Works on home, search and sidebar cards, and on Shorts cards in shelves
+- Works in every UI language, because it matches the menu icon rather than its label
+- Needs no extension permissions and sends nothing anywhere except YouTube
+
+The full-screen Shorts player at `/shorts/...` is not covered.
+
+## Install
+
+1. Download `yt-not-interested.zip` from the [latest release](https://github.com/RasmusKD/yt-not-interested/releases/latest) and unzip it.
+2. Open `chrome://extensions` (or `brave://extensions`) and turn on Developer mode.
+3. Click Load unpacked and pick the unzipped folder.
+
+## How it works
+
+The content script runs in the page, reads each card's menu data and finds the entry with the `HIDE` or `NOT_INTERESTED` icon. A click passes that entry's whole command to YouTube's own command handler, with the video id the card swap is keyed on.
+
+This relies on YouTube's internal page code and class names, which can change without notice. If a card does not swap, the button turns orange and shows a report with no tokens in it. Please paste that report into an issue.
+
+## Develop
+
+```bash
+bun test
+```
+
+## License
+
+MIT

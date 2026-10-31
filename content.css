@@ -1,0 +1,78 @@
+/* Only this menu is static. Lockup and Shorts menus are absolute, and YouTube's right-hand
+   placement of them depends on that, so they must keep their own position. */
+ytd-menu-renderer.ytni-menu {
+  position: relative;
+}
+
+/* Beside the ⋮, because several card rows end right below it. The title wraps before the button. */
+.ytLockupMetadataViewModelHost:has(.ytni-button) .ytLockupMetadataViewModelTextContainer,
+.shortsLockupViewModelHostOutsideMetadata:has(.ytni-button) > :first-child,
+#details:has(.ytni-button) #meta {
+  padding-right: 40px;
+}
+
+/* Colours, hover and press come from YouTube's button classes set in content.js. Tripled so the
+   size beats theirs, which is smaller without the classes of the ⋮ slot. */
+.ytni-button.ytni-button.ytni-button {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+/* YouTube draws the ⋮ icon after its button exists, so the button waits for the icon's shape. */
+.ytni-menu:not(:has(button:not(.ytni-button) svg path[d])) > .ytni-button {
+  visibility: hidden;
+}
+
+/* Smaller than the icon set's 24px to sit level with the ⋮, and heavier to match its solid dots. */
+.ytni-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2.6;
+  pointer-events: none;
+}
+
+/* List cards reveal their ⋮ on hover; grid cards keep it visible, so the button stays with it. */
+:is(ytd-video-renderer, ytd-compact-video-renderer) ytd-menu-renderer > .ytni-button {
+  opacity: 0;
+}
+
+:is(ytd-video-renderer, ytd-compact-video-renderer).ytni-card:hover
+  ytd-menu-renderer
+  > .ytni-button,
+:is(ytd-video-renderer, ytd-compact-video-renderer) ytd-menu-renderer > .ytni-button:focus-visible {
+  opacity: 1;
+}
+
+.ytni-button.ytni-button[data-state="busy"] {
+  cursor: progress;
+  opacity: 0.5;
+}
+
+.ytni-button.ytni-button[data-state="error"] {
+  color: #f90;
+}
+
+.ytni-report {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10000;
+  width: 480px;
+  height: 320px;
+  padding: 12px;
+  border: 1px solid #f90;
+  border-radius: 12px;
+  background: #0f0f0f;
+  color: #f1f1f1;
+  font: 12px/1.4 monospace;
+}
