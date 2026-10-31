@@ -5,10 +5,11 @@ A one-click Not interested button on YouTube video cards, right next to the ⋮ 
 The button runs the same command as the menu's own Not interested entry, so nothing is faked: YouTube sends the request and shows its normal "removed" card with Undo. There is no overlay and no clicking through the menu behind your back.
 
 - Works on home and sidebar cards and on Shorts cards in shelves, wherever the card's ⋮ menu has Not interested
+- In the full-screen Shorts player it also moves on to the next Short, and the extension's popup can turn this button off
 - Works in every UI language, because it matches the menu icon rather than its label
-- Needs no extension permissions and sends nothing anywhere except YouTube
+- Only asks for the `storage` permission, for that one setting, and sends nothing anywhere except YouTube
 
-The full-screen Shorts player at `/shorts/...` is not covered.
+The Shorts player has no Undo for this. Its menu entry sends the feedback before it asks for a reason, and the button sends that feedback and leaves the reason out. Search results have no Not interested entry, so they get no button.
 
 ## Install
 

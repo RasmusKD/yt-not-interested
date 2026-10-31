@@ -8,8 +8,11 @@
     "ytd-compact-video-renderer ytd-menu-renderer",
     "ytd-rich-grid-media ytd-menu-renderer",
     "ytd-grid-video-renderer ytd-menu-renderer",
+    "ytd-reel-video-renderer #right-controls",
   ].join(",");
+  const PLAYER = "ytd-reel-video-renderer";
   const CARDS = [
+    PLAYER,
     "yt-lockup-view-model",
     "ytm-shorts-lockup-view-model",
     "ytd-video-renderer",
@@ -25,6 +28,15 @@
     "ytSpecButtonShapeNextText",
     "ytSpecButtonShapeNextMono",
     "ytSpecButtonShapeNextSizeM",
+    "ytSpecButtonShapeNextIconButton",
+  ].join(" ");
+  // The first is the class of the ⋮ button's slot, which owns its hover circle and mouse handling.
+  const PLAYER_BUTTON = [
+    "ytdShortsPlayerControlsMenuButton",
+    "ytSpecButtonShapeNextHost",
+    "ytSpecButtonShapeNextText",
+    "ytSpecButtonShapeNextOverlay",
+    "ytSpecButtonShapeNextSizeL",
     "ytSpecButtonShapeNextIconButton",
   ].join(" ");
   const SVG = "http://www.w3.org/2000/svg";
@@ -48,6 +60,14 @@
       data.contentId ??
       data.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId;
     return { ...command, feedbackEndpoint: { ...endpoint, contentId } };
+  }
+
+  // The Shorts player's entry sends this same command, then asks for an optional reason in a sheet
+  // that only reason answers lead on from. Moving on is the action those answers carry, so it runs
+  // once YouTube has taken the feedback, and no reason is claimed for the user.
+  function withNextShort(command) {
+    const next = { reelNavigateCommand: { destination: "REEL_NAVIGATION_DESTINATION_NEXT" } };
+    return { ...command, feedbackEndpoint: { ...command.feedbackEndpoint, actions: [next] } };
   }
 
   // On the page, not the clipboard: YouTube can refuse clipboard access, and a failure
@@ -82,7 +102,9 @@
       return;
     }
     button.dataset.state = "busy";
-    const command = withContentId(hit.command, data);
+    const inPlayer = card.matches(PLAYER);
+    const command = inPlayer ? withNextShort(hit.command) : withContentId(hit.command, data);
+    const startUrl = location.href;
     try {
       document.querySelector("ytd-app").handleCommandWithCommandHandler(command, card);
     } catch (err) {
@@ -90,6 +112,26 @@
       button.dataset.state = "error";
       button.title = report;
       showReport(report);
+      return;
+    }
+    if (inPlayer) {
+      setTimeout(() => {
+        button.dataset.state = "";
+        if (location.href !== startUrl) return;
+        button.dataset.state = "error";
+        button.title = "Sent, but YouTube did not move to the next Short";
+        showReport(
+          JSON.stringify(
+            {
+              error: "sent, short not skipped",
+              commandKeys: Object.keys(command),
+              endpointKeys: Object.keys(command.feedbackEndpoint),
+            },
+            null,
+            1,
+          ),
+        );
+      }, SWAP_DEADLINE_MS);
       return;
     }
     // The swap replaces the card's contents, button included, or hides them. Undo can bring them
@@ -125,7 +167,9 @@
   function makeButton(card) {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `${PREFIX}-button ${YOUTUBE_BUTTON}`;
+    button.className = `${PREFIX}-button ${card.matches(PLAYER) ? PLAYER_BUTTON : YOUTUBE_BUTTON}`;
+    // Inline like the ⋮ button's own, so only the slot's hover circle shows, not the class's too.
+    if (card.matches(PLAYER)) button.style.backgroundColor = "transparent";
     button.title = "Not interested";
     button.setAttribute("aria-label", "Not interested");
     // Built node by node: YouTube's Trusted Types policy refuses innerHTML.

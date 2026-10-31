@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Not Interested Button for YouTube",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "One-click Not interested on YouTube, run through YouTube's own handler without opening the menu.",
   "icons": {
     "16": "icons/icon16.png",
@@ -10,11 +10,34 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["find.js", "content.js"],
-      "css": ["content.css"],
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "settings.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "find.js",
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
       "run_at": "document_idle",
       "world": "MAIN"
     }
-  ]
+  ],
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_title": "Not Interested Button",
+    "default_popup": "popup.html"
+  }
 }

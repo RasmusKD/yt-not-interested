@@ -37,6 +37,24 @@ ytd-grid-video-renderer #details:has(.ytni-button) #meta {
   padding-right: 32px;
 }
 
+/* A sibling of the ⋮ slot in the Shorts player's control row, because inside that slot hovering the
+   button lights the ⋮ too. The later controls move after it, so it lands right before the ⋮. */
+#right-controls.ytni-menu > :is(#menu-button, #fullscreen-button-shape) {
+  order: 1;
+}
+
+ytd-reel-video-renderer .ytni-button.ytni-button.ytni-button {
+  position: relative;
+  inset: auto;
+  width: 48px;
+  height: 48px;
+}
+
+/* The popup's Shorts setting, written to the root element by settings.js. */
+html[data-ytni-shorts="off"] ytd-reel-video-renderer .ytni-button.ytni-button.ytni-button {
+  display: none;
+}
+
 /* YouTube draws the ⋮ icon after its button exists, so the button waits for the icon's shape. */
 .ytni-menu:not(:has(button:not(.ytni-button) svg path[d])) > .ytni-button {
   visibility: hidden;
@@ -62,6 +80,11 @@ ytd-grid-video-renderer #details:has(.ytni-button) #meta {
   > .ytni-button,
 :is(ytd-video-renderer, ytd-compact-video-renderer) ytd-menu-renderer > .ytni-button:focus-visible {
   opacity: 1;
+}
+
+ytd-reel-video-renderer .ytni-button svg {
+  width: 24px;
+  height: 24px;
 }
 
 .ytni-button.ytni-button[data-state="busy"] {

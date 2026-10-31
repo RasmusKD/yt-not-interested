@@ -116,6 +116,56 @@ test("the report leaves tokens out", () => {
   expect(report).toContain("Ikke interesseret");
 });
 
+test("Shorts player: the plain feedback, not a reason's", () => {
+  const reason = {
+    listItemViewModel: {
+      rendererContext: {
+        commandContext: {
+          onTap: {
+            serialCommand: {
+              commands: [{ innertubeCommand: { feedbackEndpoint: { feedbackToken: "reason" } } }],
+            },
+          },
+        },
+      },
+    },
+  };
+  const data = {
+    reelPlayerOverlayRenderer: {
+      menu: {
+        menuRenderer: {
+          items: [
+            {
+              listItemViewModel: {
+                leadingImage: { sources: [{ clientResource: { imageName: "HIDE" } }] },
+                rendererContext: {
+                  commandContext: {
+                    onTap: {
+                      innertubeCommand: {
+                        commandExecutorCommand: {
+                          commands: [
+                            { feedbackEndpoint: { feedbackToken: "plain" } },
+                            {
+                              showSheetCommand: {
+                                content: { listViewModel: { listItems: [reason] } },
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+  expect(tokenOf(find(data))).toBe("plain");
+});
+
 test("no entry: null, never another entry's token", () => {
   expect(
     find({ a: { icon: "REMOVE", feedbackEndpoint: { feedbackToken: "channel" } } }),
