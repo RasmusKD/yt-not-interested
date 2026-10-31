@@ -7,12 +7,14 @@
     "ytd-video-renderer ytd-menu-renderer",
     "ytd-compact-video-renderer ytd-menu-renderer",
     "ytd-rich-grid-media ytd-menu-renderer",
+    "ytd-grid-video-renderer ytd-menu-renderer",
   ].join(",");
   const CARDS = [
     "yt-lockup-view-model",
     "ytm-shorts-lockup-view-model",
     "ytd-video-renderer",
     "ytd-compact-video-renderer",
+    "ytd-grid-video-renderer",
     "ytd-rich-item-renderer",
   ].join(",");
   // The geometry of YouTube's circle_slash icon, as centre lines so the weight is set in CSS.
@@ -90,10 +92,17 @@
       showReport(report);
       return;
     }
-    // The swap replaces the card's contents, button included, or hides them.
+    // The swap replaces the card's contents, button included, or hides them. Undo can bring them
+    // back before the deadline, so a swap is recorded when it happens, not judged at the end.
+    let swapped = false;
+    const watcher = new ResizeObserver(() => {
+      swapped ||= !button.isConnected || !button.checkVisibility();
+    });
+    watcher.observe(button);
     setTimeout(() => {
+      watcher.disconnect();
       button.dataset.state = "";
-      if (!button.isConnected || !button.checkVisibility()) return;
+      if (swapped || !button.isConnected || !button.checkVisibility()) return;
       button.dataset.state = "error";
       button.title = "Sent, but YouTube did not swap this card";
       showReport(
@@ -131,13 +140,27 @@
     return button;
   }
 
+  // Cached per data object, because every page mutation rescans every card. Search results and
+  // signed-out pages have no Not interested entry, so a card is only offered what its menu holds.
+  const offered = new WeakMap();
+
+  function offersNotInterested(data) {
+    if (!data) return false;
+    if (!offered.has(data)) offered.set(data, Boolean(globalThis.ytniFind(data)));
+    return offered.get(data);
+  }
+
+  // YouTube reuses card elements for other videos, so a button can also have to go again.
   function decorate(menu) {
     const card = menu.closest(CARDS);
     if (!card) return;
-    if (menu.querySelector(`:scope > .${PREFIX}-button`)) return;
-    card.classList.add(`${PREFIX}-card`);
-    menu.classList.add(`${PREFIX}-menu`);
-    menu.append(makeButton(card));
+    const existing = menu.querySelector(`:scope > .${PREFIX}-button`);
+    const wanted = offersNotInterested(cardData(card));
+    if (wanted === Boolean(existing)) return;
+    card.classList.toggle(`${PREFIX}-card`, wanted);
+    menu.classList.toggle(`${PREFIX}-menu`, wanted);
+    if (wanted) menu.append(makeButton(card));
+    else existing.remove();
   }
 
   const scan = () => document.querySelectorAll(MENUS).forEach(decorate);
@@ -151,5 +174,12 @@
       scan();
     });
   }).observe(document.documentElement, { childList: true, subtree: true });
+  // A reused card can take a new video's data without a child list change, and list cards only
+  // show the button on hover, so the hover settles what that card offers.
+  document.addEventListener(
+    "mouseover",
+    (event) => event.target.closest?.(CARDS)?.querySelectorAll(MENUS).forEach(decorate),
+    { passive: true },
+  );
   scan();
 })();

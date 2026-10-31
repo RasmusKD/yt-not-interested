@@ -1,6 +1,6 @@
-/* Only this menu is static. Lockup and Shorts menus are absolute, and YouTube's right-hand
-   placement of them depends on that, so they must keep their own position. */
-ytd-menu-renderer.ytni-menu {
+/* Only these menus are static. Lockup, Shorts and small grid menus are absolute, and YouTube's
+   right-hand placement of them depends on that, so they must keep their own position. */
+ytd-menu-renderer.ytni-menu:not(ytd-grid-video-renderer ytd-menu-renderer) {
   position: relative;
 }
 
@@ -24,6 +24,17 @@ ytd-menu-renderer.ytni-menu {
   width: 40px;
   height: 40px;
   padding: 0;
+}
+
+/* Small grid cards are too narrow to give up 40px of title, so the button sits under the ⋮.
+   YouTube's own 24px for the ⋮ plus the 8px the button reaches further in keeps the text clear. */
+ytd-grid-video-renderer .ytni-button.ytni-button.ytni-button {
+  top: 100%;
+  right: 0;
+}
+
+ytd-grid-video-renderer #details:has(.ytni-button) #meta {
+  padding-right: 32px;
 }
 
 /* YouTube draws the ⋮ icon after its button exists, so the button waits for the icon's shape. */
