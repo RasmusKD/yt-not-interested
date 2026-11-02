@@ -6,8 +6,10 @@ The button runs the same command as the menu's own Not interested entry, so noth
 
 - Works on home and sidebar cards and on Shorts cards in shelves, wherever the card's ⋮ menu has Not interested
 - In the full-screen Shorts player it also moves on to the next Short, and the extension's popup can turn this button off
+- An optional hotkey: hover a video and press a letter of your choice, set in the popup (off by default; never fires with Ctrl, Alt or ⌘, or while you type in a field)
+- The popup can also move the button from beside the ⋮ to under it
 - Works in every UI language, because it matches the menu icon rather than its label
-- Only asks for the `storage` permission, for that one setting, and sends nothing anywhere except YouTube
+- Only asks for the `storage` permission, for these settings, and sends nothing anywhere except YouTube
 
 The Shorts player has no Undo for this. Its menu entry sends the feedback before it asks for a reason, and the button sends that feedback and leaves the reason out. Search results have no Not interested entry, so they get no button.
 

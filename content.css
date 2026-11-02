@@ -37,6 +37,13 @@ ytd-grid-video-renderer #details:has(.ytni-button) #meta {
   padding-right: 32px;
 }
 
+/* The popup's placement setting: under the ⋮ on every card, as small grid cards always have it.
+   The title keeps its room beside the ⋮, so the button never covers a second title line. */
+html[data-ytni-place="below"] .ytni-button.ytni-button.ytni-button:not(ytd-reel-video-renderer *) {
+  top: 100%;
+  right: 0;
+}
+
 /* A sibling of the ⋮ slot in the Shorts player's control row, because inside that slot hovering the
    button lights the ⋮ too. The later controls move after it, so it lands right before the ⋮. */
 #right-controls.ytni-menu > :is(#menu-button, #fullscreen-button-shape) {

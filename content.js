@@ -218,12 +218,37 @@
       scan();
     });
   }).observe(document.documentElement, { childList: true, subtree: true });
+  // The card under the pointer, which is the one the hotkey acts on.
+  let hovered = null;
+
   // A reused card can take a new video's data without a child list change, and list cards only
   // show the button on hover, so the hover settles what that card offers.
   document.addEventListener(
     "mouseover",
-    (event) => event.target.closest?.(CARDS)?.querySelectorAll(MENUS).forEach(decorate),
+    (event) => {
+      hovered = event.target.closest?.(CARDS) ?? null;
+      hovered?.querySelectorAll(MENUS).forEach(decorate);
+    },
     { passive: true },
+  );
+
+  // The key comes from the popup through settings.js. Capture phase, so a key YouTube also binds
+  // is taken only when it acts on a card. The button's own click path does the work, so a card
+  // without a button, or with the Shorts setting off, is left alone.
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (!globalThis.ytniIsHotkey(event, document.documentElement.dataset.ytniHotkey)) return;
+      if (!hovered?.isConnected) return;
+      const button = hovered.querySelector(`.${PREFIX}-button`);
+      // Not opacity: list cards fade the button in on hover, and it is meant to work then too.
+      if (!button || button.dataset.state === "busy") return;
+      if (!button.checkVisibility({ visibilityProperty: true })) return;
+      event.preventDefault();
+      event.stopPropagation();
+      button.click();
+    },
+    true,
   );
   scan();
 })();

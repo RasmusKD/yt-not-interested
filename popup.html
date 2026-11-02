@@ -10,8 +10,10 @@
       body {
         margin: 0;
         padding: 12px 14px;
-        width: 240px;
+        width: 260px;
         font: 13px/1.4 system-ui, sans-serif;
+        display: grid;
+        gap: 12px;
       }
       label {
         display: flex;
@@ -19,10 +21,33 @@
         gap: 8px;
         cursor: pointer;
       }
+      .row {
+        justify-content: space-between;
+      }
+      #hotkey {
+        width: 3ch;
+        text-align: center;
+        font: inherit;
+        text-transform: uppercase;
+      }
+      small {
+        opacity: 0.7;
+      }
     </style>
   </head>
   <body>
     <label><input id="shorts" type="checkbox" /> Show button in the Shorts player</label>
+    <label class="row">
+      Button position
+      <select id="placement">
+        <option value="beside">Beside ⋮</option>
+        <option value="below">Under ⋮</option>
+      </select>
+    </label>
+    <div>
+      <label><input id="hotkey-on" type="checkbox" /> Hotkey: hover a video and press <input id="hotkey" maxlength="1" value="x" aria-label="Hotkey" /></label>
+      <small>Not with Ctrl, Alt or ⌘, and never while you type in a field.</small>
+    </div>
     <script src="popup.js"></script>
   </body>
 </html>
