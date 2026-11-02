@@ -218,19 +218,32 @@
       scan();
     });
   }).observe(document.documentElement, { childList: true, subtree: true });
-  // The card under the pointer, which is the one the hotkey acts on.
-  let hovered = null;
-
   // A reused card can take a new video's data without a child list change, and list cards only
   // show the button on hover, so the hover settles what that card offers.
   document.addEventListener(
     "mouseover",
-    (event) => {
-      hovered = event.target.closest?.(CARDS) ?? null;
-      hovered?.querySelectorAll(MENUS).forEach(decorate);
-    },
+    (event) => event.target.closest?.(CARDS)?.querySelectorAll(MENUS).forEach(decorate),
     { passive: true },
   );
+
+  // Where the pointer is, for the hotkey. The hover preview that starts playing after a moment is a
+  // player laid over the card from outside it, so the card is found among every layer at that
+  // point, not from the topmost element.
+  let pointer = null;
+  document.addEventListener(
+    "pointermove",
+    (event) => (pointer = { x: event.clientX, y: event.clientY }),
+    { passive: true },
+  );
+
+  function cardAtPointer() {
+    if (!pointer) return null;
+    for (const el of document.elementsFromPoint(pointer.x, pointer.y)) {
+      const card = el.closest(CARDS);
+      if (card) return card;
+    }
+    return null;
+  }
 
   // The key comes from the popup through settings.js. Capture phase, so a key YouTube also binds
   // is taken only when it acts on a card. The button's own click path does the work, so a card
@@ -239,8 +252,7 @@
     "keydown",
     (event) => {
       if (!globalThis.ytniIsHotkey(event, document.documentElement.dataset.ytniHotkey)) return;
-      if (!hovered?.isConnected) return;
-      const button = hovered.querySelector(`.${PREFIX}-button`);
+      const button = cardAtPointer()?.querySelector(`.${PREFIX}-button`);
       // Not opacity: list cards fade the button in on hover, and it is meant to work then too.
       if (!button || button.dataset.state === "busy") return;
       if (!button.checkVisibility({ visibilityProperty: true })) return;
